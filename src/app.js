@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -5,12 +6,16 @@ const app = express();
 const cors = require("cors");
 const favicon = require("express-favicon");
 const logger = require("morgan");
+const connectToDb = require("./db/connectToDb.js");
+
+connectToDb();
 
 const mainRouter = require("./routes/mainRouter.js");
+const authRouter = require("./routes/authRouter.js");
 
-const connectDB = require("./db/connect.js");
 
-// middleware
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -18,21 +23,20 @@ app.use(logger("dev"));
 app.use(express.static("public"));
 app.use(favicon(__dirname + "/public/favicon.ico"));
 
-// routes
+// Routes
 app.use("/api/v1", mainRouter);
+app.use("/api/auth", authRouter); 
 
-// connect to DB
-
-const start = async () => {
-  try {
-    // connectDB
-    await connectDB(process.env.MONGO_URI);
-    console.log("Connecting to MongoDB...");
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-start();
+// const start = async () => {
+//     try {
+//       // connectDB
+//       await connectToDb(process.env.MONGO_URI);
+//       console.log("Connecting to MongoDB...");
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
+  
+//   start();
 
 module.exports = app;
