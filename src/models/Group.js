@@ -13,4 +13,4 @@ const GroupSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Group', CategorySchema);
+module.exports = mongoose.model('Group', GroupSchema);
