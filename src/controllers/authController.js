@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const {User, validateRegisterUser, validateLoginUser} = require("../models/User");
+const Group = require('../models/Group');
 
 
 //Register
@@ -11,37 +12,66 @@ const {User, validateRegisterUser, validateLoginUser} = require("../models/User"
  * @access  public
  ------------------------------------------------*/
 
- module.exports.registerUserCtrl = asyncHandler(async (req,res) => {
-    // 1- validation
-    const { error } = validateRegisterUser(req.body);
+ module.exports.registerUserCtrl = asyncHandler(async (req, res) => {
+  // 1- Validation
+  const { error } = validateRegisterUser(req.body);
   if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-    // 2- is user already exisit
-    let user = await User.findOne({ email: req.body.email });
-  if (user) {
-    return res.status(400).json({ message: "user already exist" });
+      return res.status(400).json({ message: error.details[0].message });
   }
 
-  // 3- hash the password 
+  // 2- Check if user already exists
+  let user = await User.findOne({ email: req.body.email });
+  if (user) {
+      return res.status(400).json({ message: "User already exists" });
+  }
+
+  // 3- If the user is not an admin, assign them to a group
+  let group = null;
+  if (req.body.role !== 'admin') {
+      // Check if the group exists by its name
+      group = await Group.findOne({ name: req.body.groupName });
+
+      if (!group) {
+          // If the group doesn't exist, create it
+          group = new Group({
+              name: req.body.groupName,
+          });
+          try {
+              // Save the new group
+              await group.save();
+          } catch (err) {
+              return res.status(500).json({ message: "Failed to create group: " + err.message });
+          }
+      }
+  }
+
+  // 4- Hash the password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-  // 4- new user and save it to DB
+  // 5- Create and save the new user
   user = new User({
-    username: req.body.username,
-    email: req.body.email,
-    password: hashedPassword,
-    //chose one (admin, mentor , student )
-    // role: req.body.role,
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      email: req.body.email,
+      password: hashedPassword,
+      role: req.body.role || 'student',  // Default role is student
+      isAdmin: req.body.role === 'admin',  // If role is 'admin', set isAdmin to true
+      groupId: group ? group._id : null,  // Only assign a group if the user is not an admin
   });
-  await user.save();
 
-    // 5- send a response to client 
-    res.status(201).json({
-        message: "you register is good , please login ",
-      });
- })
+  try {
+      await user.save();  // Save the new user
+  } catch (err) {
+      return res.status(500).json({ message: "Failed to create user: " + err.message });
+  }
+
+  // 6- Send a response to the client
+  res.status(201).json({
+      message: "Registration successful. Please log in.",
+  });
+});
+
 
 
 // Login 
@@ -75,13 +105,14 @@ const {User, validateRegisterUser, validateLoginUser} = require("../models/User"
       ///#we should to Protect Routes Based on User Role
 
       // 5- response sent to the client 
-      res.status(201).json({
+      res.status(200).json({
         _id: user._id,
         isAdmin: user.isAdmin,
-        // role: user.role,   // Send role to the frontend
+        role: user.role,          // Send role to the frontend
+        groupId: user.groupId,    // Send groupId to the frontend
         profilePhoto: user.profilePhoto,
-        token,
-      });
+        token,                    // Send the JWT token
+    });
 
 
  });

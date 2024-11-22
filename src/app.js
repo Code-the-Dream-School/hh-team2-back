@@ -12,6 +12,7 @@ connectToDb();
 
 const mainRouter = require("./routes/mainRouter.js");
 const authRouter = require("./routes/authRouter.js");
+const usersRoute = require("./routes/usersRoute.js");
 
 
 
@@ -26,6 +27,7 @@ app.use(favicon(__dirname + "/public/favicon.ico"));
 // Routes
 app.use("/api/v1", mainRouter);
 app.use("/api/auth", authRouter); 
+app.use("/api/users", usersRoute); 
 
 // const start = async () => {
 //     try {
