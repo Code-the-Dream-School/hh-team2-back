@@ -7,6 +7,8 @@ const favicon = require('express-favicon');
 const logger = require('morgan');
 
 const mainRouter = require('./routes/mainRouter.js');
+const postRouter = require('./routes/postRouter.js');
+const categoryRouter = require('./routes/categoryRouter.js');
 
 const connectDB = require('./db/connect.js');
 
@@ -24,6 +26,8 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 
 // routes
 app.use('/api/v1', mainRouter);
+app.use('/api/v1/posts', postRouter);
+app.use('/api/v1/categories', categoryRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
