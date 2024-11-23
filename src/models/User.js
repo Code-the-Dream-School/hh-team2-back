@@ -78,6 +78,7 @@ UserSchema.methods.generateAuthToken = function() {
         }, 
         process.env.JWT_SECRET, 
     );
+    // { expiresIn: '1d' }
 };
 
 // User Model 
@@ -109,9 +110,22 @@ function validateLoginUser(obj) {
     return schema.validate(obj);
 }
 
+// Validate Update User 
+function validateUpdateUser(obj) {
+    const schema = Joi.object({
+        first_name: Joi.string().trim().min(2).max(100),
+        last_name: Joi.string().trim().min(2).max(100),
+        password: Joi.string().trim().min(8),
+        bio: Joi.string(),
+        // we can also add more stuff for the user so they can update like (group)...
+    });
+    return schema.validate(obj);
+}
+
 
 module.exports = {
     User,
     validateRegisterUser,
-    validateLoginUser
+    validateLoginUser,
+    validateUpdateUser
 }

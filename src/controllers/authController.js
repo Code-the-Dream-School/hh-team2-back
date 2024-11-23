@@ -94,12 +94,21 @@ const Group = require('../models/Group');
       if (!user) {
         return res.status(400).json({ message: "invalid email or password "});
       }
-      // 3- check the password 
+      // 3- check if the password matches
       const isPasswordMatch = await bcrypt.compare(req.body.password, user.password);
       if (!isPasswordMatch) {
         return res.status(400).json({ message: "invalid  password "});
       }
-      // 4- generate token (jwt)
+
+    //    // 4- Check if the user belongs to a group (only for non-admin users)
+    // let userGroup = null;
+    // if (user.role !== 'admin') {
+    //     userGroup = await Group.findById(user.groupId);
+    //     if (!userGroup) {
+    //         return res.status(400).json({ message: "User is not assigned to any group" });
+    //     }
+    // }
+      // 5- generate token (jwt)
       const token = user.generateAuthToken();
 
       ///#we should to Protect Routes Based on User Role
