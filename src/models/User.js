@@ -117,7 +117,7 @@ function validateUpdateUser(obj) {
         last_name: Joi.string().trim().min(2).max(100),
         password: Joi.string().trim().min(8),
         bio: Joi.string(),
-        // we can also add more stuff for the user so they can update like (group)...
+        // we can also add more stuff for the user so they can update like (group)...  
     });
     return schema.validate(obj);
 }

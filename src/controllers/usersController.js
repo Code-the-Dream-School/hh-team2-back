@@ -75,7 +75,7 @@ const bcrypt = require("bcryptjs");
       bio: req.body.bio
 
     }
-  }, {new: true}).select("-password");// meaning gave me the new update
+  }, {new: true}).select("-password");// meaning gave me the new update if its true 
 
   res.status(200).json(updatedUser);
 
