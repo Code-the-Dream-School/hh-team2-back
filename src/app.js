@@ -13,8 +13,8 @@ const categoryRouter = require('./routes/categoryRouter.js');
 const connectDB = require('./db/connect.js');
 
 // error handler
-const notFoundMiddleware = require('./middleware/not-found');
-const errorHandlerMiddleware = require('./middleware/error-handler');
+const notFoundMiddleware = require('./middlewares/not-found.js');
+const errorHandlerMiddleware = require('./middlewares/error-handler.js');
 
 // middleware
 app.use(cors());

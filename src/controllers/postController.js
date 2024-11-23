@@ -6,6 +6,13 @@ const Category = require('../models/Category');
 
 // ================================
 // Create POST
+//Admin
+/**-----------------------------------------------
+ * @desc   Create Post 
+ * @route   /api/v1/posts   endpoint
+ * @method  post
+ 
+ ------------------------------------------------*/
 
 const createPost = async (req, res) => {
   const { title, content, categoryId, authorId } = req.body;
@@ -42,6 +49,13 @@ const createPost = async (req, res) => {
 
 // =========================
 //find all posts
+
+/**-----------------------------------------------
+ * @desc   Get all posts
+ * @route   /api/v1/posts   endpoint
+ * @method  get
+ ------------------------------------------------*/
+
 const getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find()
@@ -60,12 +74,18 @@ const getAllPosts = async (req, res) => {
     console.error('Error retrieving posts:', error);
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
     const errorMessage = error.message || 'Error retrieving posts';
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
+    res.status(statusCode).json({ error: errorMessage });
   }
 };
 
 // =============================
 //  find all posts created by a specific author
+
+/**-----------------------------------------------
+ * @desc   Get all posts created by a specific author
+ * @route   /api/v1/posts/author/:authorId  endpoint
+ * @method  get
+ ------------------------------------------------*/
 
 const getPostsByAuthor = async (req, res) => {
   const { authorId } = req.params;
@@ -88,7 +108,60 @@ const getPostsByAuthor = async (req, res) => {
     console.error('Error retrieving posts:', error);
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
     const errorMessage = error.message || 'Error retrieving posts';
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: errorMessage });
+    res.status(statusCode).json({ error: errorMessage });
+  }
+};
+
+// ===========================================
+
+// get posts by ID
+
+/**-----------------------------------------------
+ * @desc   Get a post by ID
+ * @route   /api/v1/posts/:id  endpoint
+ * @method  get
+ ------------------------------------------------*/
+const getPostById = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    // .populate( /// commented as User Schema is not merged yet
+    //   'author',
+    //   'username'
+    // );
+    if (!post) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'No post found' });
+    }
+
+    res.status(StatusCodes.OK).json(post);
+  } catch (error) {
+    console.error('Error retrieving posts:', error);
+    const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+    const errorMessage = error.message || 'Error retrieving posts';
+    res.status(statusCode).json({ error: errorMessage });
+  }
+};
+
+// ======================================
+// delete post
+
+/**-----------------------------------------------
+ * @desc   Delete post by ID
+ * @route   /api/v1/posts/:id  endpoint
+ * @method  delete
+ ------------------------------------------------*/
+
+const deletePost = async (req, res) => {
+  try {
+    await Post.findByIdAndDelete(req.params.id);
+
+    res.status(StatusCodes.OK).json({ message: 'Post deleted' });
+  } catch (error) {
+    console.error('Error deleting Post:', error);
+    const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+    const errorMessage = error.message || 'Error deleting Post';
+    res.status(statusCode).json({ error: errorMessage });
   }
 };
 
@@ -96,4 +169,6 @@ module.exports = {
   createPost,
   getAllPosts,
   getPostsByAuthor,
+  getPostById,
+  deletePost,
 };
