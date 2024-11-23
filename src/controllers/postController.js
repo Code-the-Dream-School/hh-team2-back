@@ -57,11 +57,17 @@ const createPost = async (req, res) => {
  ------------------------------------------------*/
 
 const getAllPosts = async (req, res) => {
+  const { search, page = 1, limit = 10 } = req.query;
+  const query = search ? { title: new RegExp(search, 'i') } : {};
   try {
-    const posts = await Post.find()
+    const posts = await Post.find(query)
       .populate('category', 'name') // Populate category with its name
       //   .populate('author', 'username email') // Populate author with username and email
-      .sort({ createdAt: -1 }); // Sort by newest posts first
+      .sort({ createdAt: -1 }) // Sort by newest posts first
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const total = await Post.countDocuments(query);
 
     if (posts.length === 0) {
       return res
@@ -69,7 +75,13 @@ const getAllPosts = async (req, res) => {
         .json({ message: 'No posts found' });
     }
 
-    res.status(StatusCodes.OK).json({ posts, count: posts.length });
+    res.status(StatusCodes.OK).json({
+      posts,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      count: posts.length,
+    });
   } catch (error) {
     console.error('Error retrieving posts:', error);
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
@@ -88,6 +100,8 @@ const getAllPosts = async (req, res) => {
  ------------------------------------------------*/
 
 const getPostsByAuthor = async (req, res) => {
+  const { search, page = 1, limit = 10 } = req.query;
+  const query = search ? { title: new RegExp(search, 'i') } : {};
   const { authorId } = req.params;
 
   try {
@@ -95,7 +109,11 @@ const getPostsByAuthor = async (req, res) => {
     const posts = await Post.find({ author: authorId })
       .populate('category', 'name') // Optional: Populate category name
       //   .populate('author', 'username email') // Optional: Populate author details
-      .sort({ createdAt: -1 }); // Sort by newest first
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const total = await Post.countDocuments(query);
 
     if (posts.length === 0) {
       return res
@@ -103,7 +121,13 @@ const getPostsByAuthor = async (req, res) => {
         .json({ message: 'No posts found' });
     }
 
-    res.status(StatusCodes.OK).json({ posts, count: posts.length });
+    res.status(StatusCodes.OK).json({
+      posts,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      count: posts.length,
+    });
   } catch (error) {
     console.error('Error retrieving posts:', error);
     const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
@@ -165,10 +189,48 @@ const deletePost = async (req, res) => {
   }
 };
 
+// =====================================================
+
+// Update a post by ID
+
+/**-----------------------------------------------
+ * @desc   Update post by ID
+ * @route   /api/v1/posts/:id  endpoint
+ * @method  patch
+ ------------------------------------------------*/
+const updatePost = async (req, res) => {
+  const { id } = req.params; // Extract post ID from the route parameters
+  const updates = req.body; // Get the updated data from the request body
+
+  try {
+    // Find the post by ID and update it with new data
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      updates,
+      { new: true, runValidators: true } // Return the updated document and validate the new data
+    ).populate('category', 'name'); // Optional: Populate category name
+    //  .populate('author', 'username email'); // Optional: Populate author details
+
+    if (!updatedPost) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Post not found' });
+    }
+
+    res.status(StatusCodes.OK).json(updatedPost);
+  } catch (error) {
+    console.error('Error updating Post:', error);
+    const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+    const errorMessage = error.message || 'Error updating Post';
+    res.status(statusCode).json({ error: errorMessage });
+  }
+};
+
 module.exports = {
   createPost,
   getAllPosts,
   getPostsByAuthor,
   getPostById,
   deletePost,
+  updatePost,
 };
