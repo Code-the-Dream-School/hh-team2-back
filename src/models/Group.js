@@ -1,16 +1,24 @@
 const mongoose = require('mongoose');
+const jwt = require("jsonwebtoken");
 
+// Group Schema
 const GroupSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    mentorIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',  // References the User model for mentors
+    }],
+    studentIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',  // References the User model for students
+    }],
+}, {
+    timestamps: true,
 });
 
 module.exports = mongoose.model('Group', GroupSchema);
+
