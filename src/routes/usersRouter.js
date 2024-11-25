@@ -1,5 +1,6 @@
 const router = require("express").Router();
  const { getAllUsersCtrl, getUserProfileCtrl, updateUserProfileCtrl, getUsersCountCtrl } = require("../controllers/usersController");
+ const { changePasswordCtrl } = require("../controllers/changePasswordController");
 const { verifyTokenAndAdmin, verifyTokenOnlyUser } = require("../middlewares/verifyToken");
 const  validateObjectId = require("../middlewares/validateObjectId");
 
@@ -12,6 +13,10 @@ const  validateObjectId = require("../middlewares/validateObjectId");
          .get(validateObjectId,getUserProfileCtrl)
          .put(validateObjectId,verifyTokenOnlyUser,updateUserProfileCtrl);
 
+
+// api/users/change-password/:id (new route for changing password)
+router.route("/change-password/:id")
+  .put(validateObjectId, verifyTokenOnlyUser, changePasswordCtrl); 
 
 
 // api/users/count 

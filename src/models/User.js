@@ -115,17 +115,26 @@ function validateUpdateUser(obj) {
     const schema = Joi.object({
         first_name: Joi.string().trim().min(2).max(100),
         last_name: Joi.string().trim().min(2).max(100),
-        password: Joi.string().trim().min(8),
-        bio: Joi.string(),
-        // we can also add more stuff for the user so they can update like (group)...  
+        bio: Joi.string().optional(), // its optional for the users if they want to update their bio or no 
+         
     });
     return schema.validate(obj);
 }
+
+// Validate Change Password 
+function validateChangePassword(obj) {
+    const schema = Joi.object({
+        newPassword: Joi.string().trim().min(8).required(),  // Password must meet a minimum length
+    });
+    return schema.validate(obj);
+}
+
 
 
 module.exports = {
     User,
     validateRegisterUser,
     validateLoginUser,
-    validateUpdateUser
+    validateUpdateUser,
+    validateChangePassword
 }
