@@ -16,8 +16,6 @@ const usersRoute = require('./routes/usersRoute.js');
 const postRouter = require('./routes/postRouter.js');
 const categoryRouter = require('./routes/categoryRouter.js');
 
-const connectDB = require('./db/connect.js');
-
 // error handler
 const notFoundMiddleware = require('./middlewares/not-found.js');
 const errorHandlerMiddleware = require('./middlewares/error-handler.js');
