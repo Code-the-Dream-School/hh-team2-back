@@ -11,7 +11,7 @@ connectToDb();
 
 const mainRouter = require('./routes/mainRouter.js');
 const authRouter = require('./routes/authRouter.js');
-const usersRoute = require('./routes/usersRoute.js');
+const usersRoute = require('./routes/usersRouter.js');
 const postRouter = require('./routes/postRouter.js');
 const categoryRouter = require('./routes/categoryRouter.js');
 
