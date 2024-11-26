@@ -27,6 +27,11 @@ const GroupSchema = new mongoose.Schema(
   }
 );
 
+<<<<<<< HEAD
 const Group = mongoose.model('Group', GroupSchema);
 
 module.exports = Group;
+=======
+module.exports = mongoose.model('Group', GroupSchema);
+
+>>>>>>> 81484a76e55cfdc217284d20dd005a8025c068bf
