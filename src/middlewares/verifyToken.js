@@ -30,6 +30,17 @@ function verifyTokenAndAdmin(req, res, next) {
     });
   }
 
+  // Verify Token & only user Himself or herself 
+function verifyTokenOnlyUser(req, res, next) {
+  verifyToken(req, res, () => {  //is anonymous next()
+    if (req.user.id === req.params.id) {
+      next();
+    } else {
+      return res.status(403).json({message: "not allowed , only user himself "})
+    }
+  });
+}
+
  
  
   
@@ -37,6 +48,7 @@ function verifyTokenAndAdmin(req, res, next) {
 
 module.exports = {
     verifyToken,
-    verifyTokenAndAdmin
+    verifyTokenAndAdmin,
+    verifyTokenOnlyUser
     
   };

@@ -78,6 +78,7 @@ UserSchema.methods.generateAuthToken = function() {
         }, 
         process.env.JWT_SECRET, 
     );
+    // { expiresIn: '1d' }
 };
 
 // User Model 
@@ -109,9 +110,31 @@ function validateLoginUser(obj) {
     return schema.validate(obj);
 }
 
+// Validate Update User 
+function validateUpdateUser(obj) {
+    const schema = Joi.object({
+        first_name: Joi.string().trim().min(2).max(100),
+        last_name: Joi.string().trim().min(2).max(100),
+        bio: Joi.string().optional(), // its optional for the users if they want to update their bio or no 
+         
+    });
+    return schema.validate(obj);
+}
+
+// Validate Change Password 
+function validateChangePassword(obj) {
+    const schema = Joi.object({
+        newPassword: Joi.string().trim().min(8).required(),  // Password must meet a minimum length
+    });
+    return schema.validate(obj);
+}
+
+
 
 module.exports = {
     User,
     validateRegisterUser,
-    validateLoginUser
+    validateLoginUser,
+    validateUpdateUser,
+    validateChangePassword
 }
