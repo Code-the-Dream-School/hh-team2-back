@@ -1,10 +1,10 @@
-const path = require("path"); // Node.js module for working with file and directory paths
+const path = require("path");
 const multer = require("multer"); // Multer middleware for handling file uploads in Node.js
 
 // Photo Storage Configuration
 const photoStorage = multer.diskStorage({
   // 'destination' function determines the folder where uploaded files will be stored
-  destination: function (req, file, cb) {
+  destination: function (req, file, cb) {//cd = call back
     // Setting the folder to 'images' directory located at the parent level of the current file
     cb(null, path.join(__dirname, "../../images"));//null mean i dont have error 
   },
@@ -12,7 +12,7 @@ const photoStorage = multer.diskStorage({
   // 'filename' function defines the name of the uploaded file
   filename: function (req, file, cb) {
     // If a file is provided, create a unique name based on the current timestamp and the original file name
-    if (file) {//file will come from the clenet 
+    if (file) {//file will come from the client 
       const uniqueName = new Date().toISOString().replace(/:/g, "-") + file.originalname;
       cb(null, uniqueName); // Set the unique name for the file
     } else {
@@ -40,5 +40,5 @@ const photoUpload = multer({
   limits: { fileSize: 1024 * 1024 },// 1024 * 2 = 2MB
 });
 
-// Export the middleware for use in other files
+
 module.exports = photoUpload;

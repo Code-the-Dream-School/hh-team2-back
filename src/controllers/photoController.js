@@ -11,6 +11,7 @@ const asyncHandler = require("express-async-handler");
     if(!req.file)  {
         return res.status(400).json({ message: 'no file provided'})
     }
+    // run this console to see the output on the terminal 
     // console.log(req.file); // to get the file from the client 
     res.status(200).json({ message: 'your profile photo uploaded successfully'});
  });
