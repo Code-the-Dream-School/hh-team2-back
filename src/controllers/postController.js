@@ -2,7 +2,7 @@
 const { StatusCodes } = require('http-status-codes');
 
 const Post = require('../models/Post.js');
-const Category = require('../models/Category');
+// const Category = require('../models/Category');
 
 // ================================
 // Create POST
@@ -18,19 +18,19 @@ const createPost = async (req, res) => {
   const { title, content, categoryId, authorId } = req.body;
 
   try {
-    // Check if the category exists
-    const category = await Category.findById(categoryId);
-    if (!category) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: 'Category not found' });
-    }
+    // // Check if the category exists
+    // const category = await Category.findById(categoryId);
+    // if (!category) {
+    //   return res
+    //     .status(StatusCodes.NOT_FOUND)
+    //     .json({ message: 'Category not found' });
+    // }
 
     // Create the post
     const newPost = new Post({
       title,
       content,
-      category: categoryId,
+      // category: categoryId,
       author: authorId,
     });
 
@@ -61,8 +61,8 @@ const getAllPosts = async (req, res) => {
   const query = search ? { title: new RegExp(search, 'i') } : {};
   try {
     const posts = await Post.find(query)
-      .populate('category', 'name') // Populate category with its name
-      //   .populate('author', 'username email') // Populate author with username and email
+      // .populate('category', 'name') // Populate category with its name
+      .populate('author', 'first_name last_name email') // Populate author with username and email
       .sort({ createdAt: -1 }) // Sort by newest posts first
       .skip((page - 1) * limit)
       .limit(Number(limit));
@@ -107,8 +107,8 @@ const getPostsByAuthor = async (req, res) => {
   try {
     // Find posts where the `author` field matches the provided author ID
     const posts = await Post.find({ author: authorId })
-      .populate('category', 'name') // Optional: Populate category name
-      //   .populate('author', 'username email') // Optional: Populate author details
+      // .populate('category', 'name') // Optional: Populate category name
+      .populate('author', 'first_name last_name email') // Optional: Populate author details
       .sort({ createdAt: -1 }) // Sort by newest first
       .skip((page - 1) * limit)
       .limit(Number(limit));
@@ -147,11 +147,10 @@ const getPostsByAuthor = async (req, res) => {
  ------------------------------------------------*/
 const getPostById = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
-    // .populate( /// commented as User Schema is not merged yet
-    //   'author',
-    //   'username'
-    // );
+    const post = await Post.findById(req.params.id).populate(
+      'author',
+      'first_name last_name email'
+    );
     if (!post) {
       return res
         .status(StatusCodes.NOT_FOUND)
@@ -208,7 +207,8 @@ const updatePost = async (req, res) => {
       id,
       updates,
       { new: true, runValidators: true } // Return the updated document and validate the new data
-    ).populate('category', 'name'); // Optional: Populate category name
+    );
+    // .populate('category', 'name'); // Optional: Populate category name
     //  .populate('author', 'username email'); // Optional: Populate author details
 
     if (!updatedPost) {
