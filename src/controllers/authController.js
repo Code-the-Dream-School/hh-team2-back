@@ -120,7 +120,8 @@ const Group = require('../models/Group');
         role: user.role,          // Send role to the frontend
         groupId: user.groupId,    // Send groupId to the frontend
         profilePhoto: user.profilePhoto,
-        token,                    // Send the JWT token
+        token, 
+        first_name: user.first_name,                   // Send the JWT token
     });
 
 
