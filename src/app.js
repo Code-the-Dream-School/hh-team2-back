@@ -13,12 +13,11 @@ const mainRouter = require('./routes/mainRouter.js');
 const authRouter = require('./routes/authRouter.js');
 const usersRoute = require('./routes/usersRouter.js');
 const postRouter = require('./routes/postRouter.js');
-const categoryRouter = require('./routes/categoryRouter.js');
+// const categoryRouter = require('./routes/categoryRouter.js');
 
 const groupRouter = require('./routes/groupRouter.js');
 
 const reactionRouter = require('./routes/reactionRouter.js');
-
 
 // error handler
 const notFoundMiddleware = require('./middlewares/not-found.js');
@@ -37,12 +36,11 @@ app.use('/api/v1', mainRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRoute);
 app.use('/api/v1/posts', postRouter);
-app.use('/api/v1/categories', categoryRouter);
+// app.use('/api/v1/categories', categoryRouter);
 
 app.use('/api/v1/groups', groupRouter);
 
 app.use('/api/v1/reactions', reactionRouter);
-
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
