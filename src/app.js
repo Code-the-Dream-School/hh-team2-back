@@ -18,7 +18,7 @@ const mainRouter = require('./routes/mainRouter.js');
 const authRouter = require('./routes/authRouter.js');
 const usersRoute = require('./routes/usersRouter.js');
 const postRouter = require('./routes/postRouter.js');
-// gconst categoryRouter = require('./routes/categoryRouter.js');
+// const categoryRouter = require('./routes/categoryRouter.js');
 
 const groupRouter = require('./routes/groupRouter.js');
 
