@@ -15,23 +15,24 @@ const Category = require('../models/Category');
  ------------------------------------------------*/
 
 const createPost = async (req, res) => {
-  const { title, content, categoryId, authorId } = req.body;
+  // const { title, content, categoryId, authorId } = req.body;
+  const { title, content } = req.body;
 
   try {
     // Check if the category exists
-    const category = await Category.findById(categoryId);
-    if (!category) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: 'Category not found' });
-    }
+    // const category = await Category.findById(categoryId);
+    // if (!category) {
+    //   return res
+    //     .status(StatusCodes.NOT_FOUND)
+    //     .json({ message: 'Category not found' });
+    // }
 
     // Create the post
+
     const newPost = new Post({
       title,
       content,
-      category: categoryId,
-      author: authorId,
+      author: req.user.id,
     });
 
     // Save the post to the database
