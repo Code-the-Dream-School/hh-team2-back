@@ -5,6 +5,7 @@ const app = express();
 const cors = require('cors');
 const favicon = require('express-favicon');
 const logger = require('morgan');
+
 const connectToDb = require('./db/connectToDb.js');
 
 connectToDb();
@@ -24,13 +25,18 @@ const notFoundMiddleware = require('./middlewares/not-found.js');
 const errorHandlerMiddleware = require('./middlewares/error-handler.js');
 
 // Middleware
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
 app.use(express.static('public'));
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
+
+// cors 
+app.use(cors({
+    origin: "http://localhost:5173"
+}));
 // routes
 app.use('/api/v1', mainRouter);
 app.use('/api/auth', authRouter);
