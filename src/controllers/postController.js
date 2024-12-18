@@ -2,7 +2,14 @@
 const { StatusCodes } = require('http-status-codes');
 
 const Post = require('../models/Post.js');
-// const Category = require('../models/Category');
+
+const path = require('path');
+const fs = require('fs');
+
+const {
+  cloudinaryUploadImage,
+  cloudinaryRemoveImage,
+} = require('../utils/cloudinary');
 
 // ================================
 // Create POST
@@ -15,27 +22,36 @@ const Post = require('../models/Post.js');
  ------------------------------------------------*/
 
 const createPost = async (req, res) => {
-  const { title, content, categoryId, authorId } = req.body;
+  const { title, content } = req.body;
 
   try {
-    // // Check if the category exists
-    // const category = await Category.findById(categoryId);
-    // if (!category) {
-    //   return res
-    //     .status(StatusCodes.NOT_FOUND)
-    //     .json({ message: 'Category not found' });
-    // }
+    let imageUrl = null;
+
+    if (req.file) {
+      const imagePath = path.join(
+        __dirname,
+        `../../images/${req.file.filename}`
+      );
+
+      // Upload the image to cloudinary
+      const result = await cloudinaryUploadImage(imagePath);
+      imageUrl = result.secure_url; // Get the secure URL for the uploaded image
+
+      // Remove image from the server
+      fs.unlinkSync(imagePath);
+    }
 
     // Create the post
     const newPost = new Post({
       title,
       content,
-      // category: categoryId,
-      author: authorId,
+      author: req.user.id, // assuming the user is authenticated
+      image: imageUrl,
     });
 
     // Save the post to the database
     await newPost.save();
+
     res
       .status(StatusCodes.CREATED)
       .json({ message: 'The post has been successfully created.', newPost });
