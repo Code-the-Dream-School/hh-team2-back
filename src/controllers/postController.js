@@ -39,6 +39,7 @@ const createPost = async (req, res) => {
     }
 
     // Create the post
+
     const newPost = new Post({
       title,
       content,
