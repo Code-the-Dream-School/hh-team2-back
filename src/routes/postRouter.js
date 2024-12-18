@@ -26,6 +26,6 @@ router
   .route('/:id')
   .get(getPostById)
   .delete(verifyToken, deletePost)
-  .patch(verifyToken, updatePost);
+  .patch(verifyToken, photoUpload.single('image'), updatePost);
 
 module.exports = router;

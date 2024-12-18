@@ -6,10 +6,7 @@ const Post = require('../models/Post.js');
 const path = require('path');
 const fs = require('fs');
 
-const {
-  cloudinaryUploadImage,
-  cloudinaryRemoveImage,
-} = require('../utils/cloudinary');
+const { cloudinaryUploadImage } = require('../utils/cloudinary');
 
 // ================================
 // Create POST
@@ -193,6 +190,23 @@ const getPostById = async (req, res) => {
 
 const deletePost = async (req, res) => {
   try {
+    const { id } = req.params; // Extract post ID from the route parameters
+    // await Post.findByIdAndDelete(req.params.id);
+
+    const post = await Post.findById(id);
+    if (!post) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Post not found' });
+    }
+
+    // Verify if the authenticated user is the post's author
+    if (post.author.toString() !== req.user.id) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: 'Unauthorized to delete this post' });
+    }
+
     await Post.findByIdAndDelete(req.params.id);
 
     res.status(StatusCodes.OK).json({ message: 'Post deleted' });
@@ -215,24 +229,41 @@ const deletePost = async (req, res) => {
  ------------------------------------------------*/
 const updatePost = async (req, res) => {
   const { id } = req.params; // Extract post ID from the route parameters
-  const updates = req.body; // Get the updated data from the request body
+  const { title, content } = req.body; // Get the updated data from the request body
 
   try {
-    // Find the post by ID and update it with new data
-    const updatedPost = await Post.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true } // Return the updated document and validate the new data
-    );
-    // .populate('category', 'name'); // Optional: Populate category name
-    //  .populate('author', 'username email'); // Optional: Populate author details
-
-    if (!updatedPost) {
+    const post = await Post.findById(id);
+    if (!post) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: 'Post not found' });
     }
 
+    // Verify if the authenticated user is the post's author
+    if (post.author.toString() !== req.user.id) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: 'Unauthorized to update this post' });
+    }
+
+    let imageUrl = post.image;
+
+    // If a new image is uploaded, upload to Cloudinary
+    if (req.file) {
+      const result = await cloudinaryUploadImage(req.file.path);
+      imageUrl = result.secure_url; // Update the image URL
+
+      // Clean up the temporary file
+      // Remove image from the server
+      fs.unlinkSync(req.file.path);
+    }
+
+    // Update the post fields
+    post.title = title || post.title;
+    post.content = content || post.content;
+    post.image = imageUrl;
+
+    const updatedPost = await post.save();
     res.status(StatusCodes.OK).json(updatedPost);
   } catch (error) {
     console.error('Error updating Post:', error);
