@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { verifyToken } = require('../middlewares/verifyToken');
 //const validateObjectId = require('../middlewares/validateObjectId');
+const photoUpload = require('../middlewares/photoUpload');
 
 const {
   createPost,
@@ -259,7 +260,10 @@ const {
  */
 
 //add a new post and get all posts
-router.route('/').post(verifyToken, createPost).get(getAllPosts);
+router
+  .route('/')
+  .post(verifyToken, photoUpload.single('image'), createPost)
+  .get(getAllPosts);
 
 // Get all posts by an author
 router.route('/author/:authorId').get(getPostsByAuthor);
@@ -269,6 +273,6 @@ router
   .route('/:id')
   .get(getPostById)
   .delete(verifyToken, deletePost)
-  .patch(verifyToken, updatePost);
+  .patch(verifyToken, photoUpload.single('image'), updatePost);
 
 module.exports = router;
