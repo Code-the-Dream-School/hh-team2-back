@@ -2,7 +2,11 @@
 const { StatusCodes } = require('http-status-codes');
 
 const Post = require('../models/Post.js');
-const Category = require('../models/Category');
+
+const path = require('path');
+const fs = require('fs');
+
+const { cloudinaryUploadImage } = require('../utils/cloudinary');
 
 // ================================
 // Create POST
@@ -15,27 +19,37 @@ const Category = require('../models/Category');
  ------------------------------------------------*/
 
 const createPost = async (req, res) => {
-  const { title, content, categoryId, authorId } = req.body;
+  const { title, content } = req.body;
 
   try {
-    // Check if the category exists
-    const category = await Category.findById(categoryId);
-    if (!category) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: 'Category not found' });
+    let imageUrl = null;
+
+    if (req.file) {
+      const imagePath = path.join(
+        __dirname,
+        `../../images/${req.file.filename}`
+      );
+
+      // Upload the image to cloudinary
+      const result = await cloudinaryUploadImage(imagePath);
+      imageUrl = result.secure_url; // Get the secure URL for the uploaded image
+
+      // Remove image from the server
+      fs.unlinkSync(imagePath);
     }
 
     // Create the post
+
     const newPost = new Post({
       title,
       content,
-      category: categoryId,
-      author: authorId,
+      author: req.user.id, // assuming the user is authenticated
+      image: imageUrl,
     });
 
     // Save the post to the database
     await newPost.save();
+
     res
       .status(StatusCodes.CREATED)
       .json({ message: 'The post has been successfully created.', newPost });
@@ -61,8 +75,8 @@ const getAllPosts = async (req, res) => {
   const query = search ? { title: new RegExp(search, 'i') } : {};
   try {
     const posts = await Post.find(query)
-      .populate('category', 'name') // Populate category with its name
-      //   .populate('author', 'username email') // Populate author with username and email
+      // .populate('category', 'name') // Populate category with its name
+      .populate('author', 'first_name last_name email') // Populate author with username and email
       .sort({ createdAt: -1 }) // Sort by newest posts first
       .skip((page - 1) * limit)
       .limit(Number(limit));
@@ -107,8 +121,8 @@ const getPostsByAuthor = async (req, res) => {
   try {
     // Find posts where the `author` field matches the provided author ID
     const posts = await Post.find({ author: authorId })
-      .populate('category', 'name') // Optional: Populate category name
-      //   .populate('author', 'username email') // Optional: Populate author details
+      // .populate('category', 'name') // Optional: Populate category name
+      .populate('author', 'first_name last_name email') // Optional: Populate author details
       .sort({ createdAt: -1 }) // Sort by newest first
       .skip((page - 1) * limit)
       .limit(Number(limit));
@@ -147,11 +161,10 @@ const getPostsByAuthor = async (req, res) => {
  ------------------------------------------------*/
 const getPostById = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
-    // .populate( /// commented as User Schema is not merged yet
-    //   'author',
-    //   'username'
-    // );
+    const post = await Post.findById(req.params.id).populate(
+      'author',
+      'first_name last_name email'
+    );
     if (!post) {
       return res
         .status(StatusCodes.NOT_FOUND)
@@ -178,6 +191,23 @@ const getPostById = async (req, res) => {
 
 const deletePost = async (req, res) => {
   try {
+    const { id } = req.params; // Extract post ID from the route parameters
+    // await Post.findByIdAndDelete(req.params.id);
+
+    const post = await Post.findById(id);
+    if (!post) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Post not found' });
+    }
+
+    // Verify if the authenticated user is the post's author
+    if (post.author.toString() !== req.user.id) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: 'Unauthorized to delete this post' });
+    }
+
     await Post.findByIdAndDelete(req.params.id);
 
     res.status(StatusCodes.OK).json({ message: 'Post deleted' });
@@ -200,23 +230,41 @@ const deletePost = async (req, res) => {
  ------------------------------------------------*/
 const updatePost = async (req, res) => {
   const { id } = req.params; // Extract post ID from the route parameters
-  const updates = req.body; // Get the updated data from the request body
+  const { title, content } = req.body; // Get the updated data from the request body
 
   try {
-    // Find the post by ID and update it with new data
-    const updatedPost = await Post.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true } // Return the updated document and validate the new data
-    ).populate('category', 'name'); // Optional: Populate category name
-    //  .populate('author', 'username email'); // Optional: Populate author details
-
-    if (!updatedPost) {
+    const post = await Post.findById(id);
+    if (!post) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: 'Post not found' });
     }
 
+    // Verify if the authenticated user is the post's author
+    if (post.author.toString() !== req.user.id) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: 'Unauthorized to update this post' });
+    }
+
+    let imageUrl = post.image;
+
+    // If a new image is uploaded, upload to Cloudinary
+    if (req.file) {
+      const result = await cloudinaryUploadImage(req.file.path);
+      imageUrl = result.secure_url; // Update the image URL
+
+      // Clean up the temporary file
+      // Remove image from the server
+      fs.unlinkSync(req.file.path);
+    }
+
+    // Update the post fields
+    post.title = title || post.title;
+    post.content = content || post.content;
+    post.image = imageUrl;
+
+    const updatedPost = await post.save();
     res.status(StatusCodes.OK).json(updatedPost);
   } catch (error) {
     console.error('Error updating Post:', error);

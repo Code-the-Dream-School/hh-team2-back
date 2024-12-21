@@ -15,11 +15,11 @@ const PostSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
-    },
-    imageUrl: {
+    // category: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: 'Category',
+    // },
+    image: {
       type: String,
     },
     publishedAt: {
