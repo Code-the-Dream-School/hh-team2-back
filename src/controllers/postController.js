@@ -201,14 +201,19 @@ const deletePost = async (req, res) => {
         .json({ message: 'Post not found' });
     }
 
-    // Verify if the authenticated user is the post's author
-    if (post.author.toString() !== req.user.id) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: 'Unauthorized to delete this post' });
-    }
+    // Only admin and the author of the post can delete post
+    if (req.user.role === 'admin') {
+      await Post.findByIdAndDelete(req.params.id);
+    } else {
+      // Verify if the authenticated user is the post's author
+      if (post.author.toString() !== req.user.id) {
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json({ message: 'Unauthorized to delete this post' });
+      }
 
-    await Post.findByIdAndDelete(req.params.id);
+      await Post.findByIdAndDelete(req.params.id);
+    }
 
     res.status(StatusCodes.OK).json({ message: 'Post deleted' });
   } catch (error) {
