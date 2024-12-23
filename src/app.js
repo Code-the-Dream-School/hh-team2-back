@@ -38,7 +38,7 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 
 // cors 
 app.use(cors({
-    origin: "http://localhost:5173"
+    origin: "http://localhost:3000"
 }));
 // routes
 app.use('/api/v1', mainRouter);
