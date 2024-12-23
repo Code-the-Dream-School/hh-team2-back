@@ -214,7 +214,6 @@ const deletePost = async (req, res) => {
           .status(StatusCodes.UNAUTHORIZED)
           .json({ message: 'Unauthorized to delete this post' });
       }
-
       await Comment.deleteMany({ post: req.params.id });
       await Post.findByIdAndDelete(req.params.id);
     }
