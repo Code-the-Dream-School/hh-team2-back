@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const {User, validateRegisterUser, validateLoginUser} = require("../models/User");
-const Group = require('../models/Group');
+// const Group = require('../models/Group');
 
 
 //Register
@@ -26,24 +26,24 @@ const Group = require('../models/Group');
   }
 
   // 3- If the user is not an admin, assign them to a group
-  let group = null;
-  if (req.body.role !== 'admin') {
-      // Check if the group exists by its name
-      group = await Group.findOne({ name: req.body.groupName });
+//   let group = null;
+//   if (req.body.role !== 'admin' && req.body.groupName) {
+//     // Only check for the group if the role is not admin and groupName is provided
+//     group = await Group.findOne({ name: req.body.groupName });
 
-      if (!group) {
-          // If the group doesn't exist, create it
-          group = new Group({
-              name: req.body.groupName,
-          });
-          try {
-              // Save the new group
-              await group.save();
-          } catch (err) {
-              return res.status(500).json({ message: "Failed to create group: " + err.message });
-          }
-      }
-  }
+//     if (!group) {
+//       // If the group doesn't exist, create it
+//       group = new Group({
+//         name: req.body.groupName,
+//       });
+//       try {
+//         // Save the new group
+//         await group.save();
+//       } catch (err) {
+//         return res.status(500).json({ message: "Failed to create group: " + err.message });
+//       }
+//     }
+//   }
 
   // 4- Hash the password
   const salt = await bcrypt.genSalt(10);
@@ -55,9 +55,9 @@ const Group = require('../models/Group');
       last_name: req.body.last_name,
       email: req.body.email,
       password: hashedPassword,
-      role: req.body.role || 'student',  // Default role is student
+    //   role: req.body.role || 'student',  // Default role is student
       isAdmin: req.body.role === 'admin',  // If role is 'admin', set isAdmin to true
-      groupId: group ? group._id : null,  // Only assign a group if the user is not an admin
+    //   groupId: group ? group._id : null,  // Only assign a group if the user is not an admin
   });
 
   try {
@@ -117,8 +117,8 @@ const Group = require('../models/Group');
       res.status(200).json({
         _id: user._id,
         isAdmin: user.isAdmin,
-        role: user.role,          // Send role to the frontend
-        groupId: user.groupId,    // Send groupId to the frontend
+        // role: user.role,          // Send role to the frontend
+        // groupId: user.groupId,    // Send groupId to the frontend
         profilePhoto: user.profilePhoto,
         token, 
         first_name: user.first_name,                   // Send the JWT token

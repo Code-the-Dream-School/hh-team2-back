@@ -18,6 +18,7 @@ const photoUpload = require("../middlewares/photoUpload");
 // api/users/photo-upload
 router.route("/photo-upload") 
 .post(verifyToken, photoUpload.single("image"), PhotoUploadCtrl)
+//router.post('/users/photo-upload', upload.single('profilePhoto'), PhotoUploadCtrl);
 
 
 
