@@ -50,30 +50,31 @@ const UserSchema = new mongoose.Schema({
     isAccountVerified: {
         type:Boolean,
         default: false,
-    },
-    role: {
-        type: String,
-        enum: ['student', 'mentor', 'admin'], // Roles allowed
-        default: 'student',  // Default role is student
-    },
-    groupId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Group',  // Reference to a Group collection
-        required: function() { return this.role !== 'admin'; },
-    },
+    // },
+    // role: {
+    //     type: String,
+    //     enum: ['student', 'mentor', 'admin'], // Roles allowed
+    //     default: 'student',  // Default role is student
+    // },
+    // groupId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Group',  // Reference to a Group collection
+    //     required: function() { return this.role !== 'admin'; },
+    // },
 
-}, {
-    timestamps: true,
+}, 
+},
+{ timestamps: true }
    
-});
+);
 
 // Generate Auth Token 
 UserSchema.methods.generateAuthToken = function() {
     return jwt.sign(
         { 
             id: this._id, 
-            role: this.role, 
-            groupId: this.groupId || null,   // Admin will have null groupId  
+            // role: this.role, 
+            // groupId: this.groupId || null,   // Admin will have null groupId  
             isAdmin: this.isAdmin 
         }, 
         process.env.JWT_SECRET, 
@@ -91,12 +92,12 @@ function validateRegisterUser(obj) {
         last_name: Joi.string().trim().min(2).max(100).required(),
         email: Joi.string().trim().min(5).max(100).required().email(),
         password: Joi.string().trim().min(8).required(),
-        role: Joi.string().valid('student', 'mentor', 'admin').optional(),  // role can be passed
-        groupName: Joi.string().when('role', {
-            is: Joi.not('admin'),  // Only require groupName if the role is not 'admin'
-            then: Joi.required(),
-            otherwise: Joi.optional()
-        }),
+        // role: Joi.string().valid('student', 'mentor', 'admin').optional(),  // role can be passed
+        // groupName: Joi.string().when('role', {
+        //     is: Joi.not('admin'),  // Only require groupName if the role is not 'admin'
+        //     then: Joi.optional(),
+        //     otherwise: Joi.optional()
+        // }),
     });
     return schema.validate(obj);
 }
