@@ -2,6 +2,7 @@
 const { StatusCodes } = require('http-status-codes');
 
 const Post = require('../models/Post.js');
+const Comment = require('../models/Comment.js');
 
 const path = require('path');
 const fs = require('fs');
@@ -203,6 +204,8 @@ const deletePost = async (req, res) => {
 
     // Only admin and the author of the post can delete post
     if (req.user.role === 'admin') {
+      // Delete a post and all comments associated with the post
+      await Comment.deleteMany({ post: req.params.id });
       await Post.findByIdAndDelete(req.params.id);
     } else {
       // Verify if the authenticated user is the post's author
@@ -211,7 +214,7 @@ const deletePost = async (req, res) => {
           .status(StatusCodes.UNAUTHORIZED)
           .json({ message: 'Unauthorized to delete this post' });
       }
-
+      await Comment.deleteMany({ post: req.params.id });
       await Post.findByIdAndDelete(req.params.id);
     }
 
