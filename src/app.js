@@ -106,13 +106,10 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// cors
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-  })
-);
-
+// cors 
+app.use(cors({
+    origin: "http://localhost:3000"
+}));
 // routes
 app.use('/api/v1', mainRouter);
 app.use('/api/auth', authRouter);
