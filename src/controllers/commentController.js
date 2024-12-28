@@ -78,4 +78,28 @@ const updateComment = async (req, res, next) =>{
     }
 };
 
-module.exports = {createComment, deleteComment, updateComment};
+//get all comments
+
+const getComments = async (req, res, next) =>{
+    try{
+        const {post,user} = req.query;
+        const filter = {};
+        if(post) filter.post = post;
+        if (user) filter.user = user;
+
+        const comments = await Comment.find(filter)
+        .populate('user', 'first_name last_name email')
+        .populate('post', 'title content')
+        .sort({createdAt: -1});
+
+        if(!comments.length){
+            throw new NotFoundError('Comments not found');
+        }
+
+        res.status(200).json({success: true, comments});
+    } catch(error){
+        next(error);
+    }
+};
+
+module.exports = {createComment, deleteComment, updateComment, getComments};
