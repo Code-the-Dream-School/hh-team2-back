@@ -11,9 +11,11 @@ const cors = require('cors');
 const favicon = require('express-favicon');
 const logger = require('morgan');
 
+
 const connectToDb = require('./db/connectToDb.js');
 
 connectToDb();
+
 
 const mainRouter = require('./routes/mainRouter.js');
 const authRouter = require('./routes/authRouter.js');
