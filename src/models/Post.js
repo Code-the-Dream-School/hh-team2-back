@@ -19,6 +19,18 @@ const PostSchema = new mongoose.Schema(
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: 'Category',
     // },
+    category: {
+      type: String,
+      enum: [
+        'Intro to Programming',
+        'React',
+        'Node',
+        'Python',
+        'Ruby',
+        'General',
+      ],
+      default: 'General',
+    },
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,
