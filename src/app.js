@@ -27,6 +27,9 @@ const groupRouter = require('./routes/groupRouter.js');
 
 const reactionRouter = require('./routes/reactionRouter.js');
 
+const commentRouter = require('./routes/commentRouter.js')
+
+
 // error handler
 const notFoundMiddleware = require('./middlewares/not-found.js');
 const errorHandlerMiddleware = require('./middlewares/error-handler.js');
@@ -122,6 +125,7 @@ app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/groups', groupRouter);
 
 app.use('/api/v1/reactions', reactionRouter);
+app.use('/api/v1/comments', commentRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
