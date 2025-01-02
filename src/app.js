@@ -19,7 +19,7 @@ const mainRouter = require('./routes/mainRouter.js');
 const authRouter = require('./routes/authRouter.js');
 const usersRoute = require('./routes/usersRouter.js');
 const postRouter = require('./routes/postRouter.js');
-// const categoryRouter = require('./routes/categoryRouter.js');
+const categoryRouter = require('./routes/categoryRouter.js');
 
 const groupRouter = require('./routes/groupRouter.js');
 
@@ -118,7 +118,7 @@ app.use('/api/v1', mainRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRoute);
 app.use('/api/v1/posts', postRouter);
-// app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/categories', categoryRouter);
 
 app.use('/api/v1/groups', groupRouter);
 
