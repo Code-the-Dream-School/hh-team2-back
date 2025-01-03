@@ -20,7 +20,7 @@ const { cloudinaryUploadImage } = require('../utils/cloudinary');
  ------------------------------------------------*/
 
 const createPost = async (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, category } = req.body;
 
   try {
     let imageUrl = null;
@@ -44,6 +44,7 @@ const createPost = async (req, res) => {
     const newPost = new Post({
       title,
       content,
+      category,
       author: req.user.id, // assuming the user is authenticated
       image: imageUrl,
     });
@@ -270,6 +271,7 @@ const updatePost = async (req, res) => {
     // Update the post fields
     post.title = title || post.title;
     post.content = content || post.content;
+    post.category = category || post.category;
     post.image = imageUrl;
 
     const updatedPost = await post.save();
