@@ -74,7 +74,17 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   const { search, page = 1, limit = 10 } = req.query;
-  const query = search ? { title: new RegExp(search, 'i') } : {};
+
+  // const query = search ? { title: new RegExp(search, 'i') } : {};
+  const query = search
+    ? {
+        $or: [
+          { title: new RegExp(search, 'i') },
+          { category: new RegExp(search, 'i') },
+        ],
+      }
+    : {};
+
   try {
     const posts = await Post.find(query)
       // .populate('category', 'name') // Populate category with its name
@@ -85,11 +95,11 @@ const getAllPosts = async (req, res) => {
 
     const total = await Post.countDocuments(query);
 
-    if (posts.length === 0) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: 'No posts found' });
-    }
+    // if (posts.length === 0) {
+    //   return res
+    //     .status(StatusCodes.NOT_FOUND)
+    //     .json({ message: 'No posts found' });
+    // }
 
     res.status(StatusCodes.OK).json({
       posts,
@@ -131,11 +141,11 @@ const getPostsByAuthor = async (req, res) => {
 
     const total = await Post.countDocuments(query);
 
-    if (posts.length === 0) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ message: 'No posts found' });
-    }
+    // if (posts.length === 0) {
+    //   return res
+    //     .status(StatusCodes.NOT_FOUND)
+    //     .json({ message: 'No posts found' });
+    // }
 
     res.status(StatusCodes.OK).json({
       posts,
