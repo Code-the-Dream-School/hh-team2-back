@@ -73,17 +73,14 @@ const createPost = async (req, res) => {
  ------------------------------------------------*/
 
 const getAllPosts = async (req, res) => {
-  const { search, page = 1, limit = 10 } = req.query;
+  const { search, page = 1, limit = 10, category } = req.query;
 
-  // const query = search ? { title: new RegExp(search, 'i') } : {};
-  const query = search
-    ? {
-        $or: [
-          { title: new RegExp(search, 'i') },
-          { category: new RegExp(search, 'i') },
-        ],
-      }
-    : {};
+  const query = {
+    $and: [
+      { title: new RegExp(search, 'i') },
+      { category: new RegExp(category, 'i') },
+    ],
+  };
 
   try {
     const posts = await Post.find(query)
