@@ -27,6 +27,7 @@ const reactionRouter = require('./routes/reactionRouter.js');
 
 const commentRouter = require('./routes/commentRouter.js')
 
+const messageRouter = require('./routes/messageRouter.js');
 
 // error handler
 const notFoundMiddleware = require('./middlewares/not-found.js');
@@ -97,6 +98,47 @@ const swaggerOptions = {
             },
           },
         },
+        Message:{
+          type: 'object',
+          properties:{
+            _id:{
+              type: 'string',
+              example: '64db4d394a9a7a00125f2c1b',
+            },
+            sender: {
+              type: 'string',
+              example: '64db4d394a9a7a00125f2c1b',
+            },
+            receiver: {
+              type: 'string',
+              example: '64db4d394a9a7a00125f2c1b',
+            },
+            content:{
+              type: 'string',
+              example: 'Hello!',
+            },
+            emojis:{
+              type: 'array',
+              items: {
+                type: 'object',
+                properties:{
+                  emoji:{
+                    type: 'string',
+                    example: '😀',
+                  },
+                  userId: {
+                    type: 'string',
+                    example: '64db4d394a9a7a00125f2c1b',
+                  },
+                },
+              },
+            },
+            status: {
+              type: 'string',
+              example: 'unread',
+            },
+          },
+        },
       },
     },
   },
@@ -124,6 +166,7 @@ app.use('/api/v1/groups', groupRouter);
 
 app.use('/api/v1/reactions', reactionRouter);
 app.use('/api/v1/comments', commentRouter);
+app.use('/api/v1/messages', messageRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
