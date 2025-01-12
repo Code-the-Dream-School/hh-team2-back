@@ -21,7 +21,7 @@ const mainRouter = require('./routes/mainRouter.js');
 const authRouter = require('./routes/authRouter.js');
 const usersRoute = require('./routes/usersRouter.js');
 const postRouter = require('./routes/postRouter.js');
-// const categoryRouter = require('./routes/categoryRouter.js');
+const categoryRouter = require('./routes/categoryRouter.js');
 
 const groupRouter = require('./routes/groupRouter.js');
 
@@ -29,6 +29,7 @@ const reactionRouter = require('./routes/reactionRouter.js');
 
 const commentRouter = require('./routes/commentRouter.js')
 
+const messageRouter = require('./routes/messageRouter.js');
 
 // error handler
 const notFoundMiddleware = require('./middlewares/not-found.js');
@@ -99,6 +100,47 @@ const swaggerOptions = {
             },
           },
         },
+        Message:{
+          type: 'object',
+          properties:{
+            _id:{
+              type: 'string',
+              example: '64db4d394a9a7a00125f2c1b',
+            },
+            sender: {
+              type: 'string',
+              example: '64db4d394a9a7a00125f2c1b',
+            },
+            receiver: {
+              type: 'string',
+              example: '64db4d394a9a7a00125f2c1b',
+            },
+            content:{
+              type: 'string',
+              example: 'Hello!',
+            },
+            emojis:{
+              type: 'array',
+              items: {
+                type: 'object',
+                properties:{
+                  emoji:{
+                    type: 'string',
+                    example: '😀',
+                  },
+                  userId: {
+                    type: 'string',
+                    example: '64db4d394a9a7a00125f2c1b',
+                  },
+                },
+              },
+            },
+            status: {
+              type: 'string',
+              example: 'unread',
+            },
+          },
+        },
       },
     },
   },
@@ -120,12 +162,13 @@ app.use('/api/v1', mainRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRoute);
 app.use('/api/v1/posts', postRouter);
-// app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/categories', categoryRouter);
 
 app.use('/api/v1/groups', groupRouter);
 
 app.use('/api/v1/reactions', reactionRouter);
 app.use('/api/v1/comments', commentRouter);
+app.use('/api/v1/messages', messageRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
