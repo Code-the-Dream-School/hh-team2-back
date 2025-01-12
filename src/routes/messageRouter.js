@@ -16,7 +16,7 @@ const {verifyToken} = require('../middlewares/verifyToken');
 router.post('/', verifyToken, sendMessage);
 
 //search user
-router.get('/search', verifyToken, searchUsers);
+router.post('/search', verifyToken, searchUsers);
 
 //get messages from one sender
 router.get('/:userId', verifyToken,  getMessages);
