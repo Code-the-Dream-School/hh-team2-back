@@ -92,9 +92,9 @@ const getComments = async (req, res, next) =>{
         .populate('post', 'title content')
         .sort({createdAt: -1});
 
-        if(!comments.length){
-            throw new NotFoundError('Comments not found');
-        }
+        // if(!comments.length){
+        //     throw new NotFoundError('Comments not found');
+        // }
 
         res.status(200).json({success: true, comments});
     } catch(error){
