@@ -17,18 +17,17 @@ const sendMessage = async (req, res) =>{
 };
 
 
-//serch for user by name or email
+//serch for user by name 
 const searchUsers = async (req, res) =>{
-    const {searchUser} =req.body;
+    const {query} =req.query;
 
     try{
         const users = await User.find({
             $or:[
-                {first_name: {$regex: searchUser, $options: "i"}},
-                {last_name: {$regex: searchUser, $options: "i"}},
-                {email: {$regex: searchUser, $options: "i"}},
+                {first_name: {$regex: query, $options: "i"}},
+                {last_name: {$regex: query, $options: "i"}}
             ]
-        }).select("_id first_name last_name email");
+        }).select("_id first_name last_name");
         res.status(200).json(users);
     }catch(error){
         res.status(500).json({error:"An error occured with search users"});
